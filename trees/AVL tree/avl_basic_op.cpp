@@ -8,8 +8,14 @@ struct t_node{
 };
 //template<class t>
 class avl{
-    struct t_node *root;
+    struct t_node *root=new t_node;
 public:
+	avl()
+	{
+		root->h=0;
+		root->left=NULL;
+		root->right=NULL;
+	}
 	
 	void levelOrder_h(t_node *r)
 	{
@@ -82,7 +88,7 @@ public:
 			t1->left=t3;
 			t3->left=t2;
 		}
-		upd_h(curr);
+		//upd_h(curr);
 	}
 	
 	void right_cases(t_node *curr)
@@ -156,9 +162,11 @@ public:
 			}
 		}
 	}
-    void insert(t_node *n)
+    void insert(int n_v)
     {
-        int ins_at,top=-1;    //this variable can have only 2 values. 0 or 1. 0 denotes insertion at left and 1 at right of r
+    	t_node *n;
+		n=create_n(n_v);
+        int ins_at,top=-1;    //variable ins_at can have only 2 values. 0 or 1. 0 denotes insertion at left and 1 at right of r
         t_node *r=root;
         t_node *stack[100]={NULL};
         if(r==NULL)
@@ -199,10 +207,19 @@ public:
         stack[++top]=n;
         ass_h(stack,top);
     }
+    t_node* get_root()
+    {
+    	return root;
+	}
     
 };              //AVL class ends here
 
 int main()
 {
+	avl a;
+	a.insert(10);
+	a.insert(15);
+	a.insert(5);
+	a.inOrder(a.get_root());
     return 0;
 }
