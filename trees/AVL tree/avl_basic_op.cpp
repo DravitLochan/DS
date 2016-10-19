@@ -57,12 +57,24 @@ public:
     }
     void inOrder(t_node *root)
     {
+    	
         if(root->left)
             inOrder(root->left);
+        if(root)    
         cout<<root->val<<" ";
         if(root->right)
             inOrder(root->right);
     }
+	
+	void preOrder(t_node *r)
+	{
+		if(root)    
+		cout<<r->val<<" ";
+		if(r->left)
+		preOrder(r->left);
+		if(r->right)
+		preOrder(r->right);
+	}
 	
 	void left_cases(t_node *curr)
 	{
@@ -217,9 +229,41 @@ public:
 int main()
 {
 	avl a;
-	a.insert(10);
-	a.insert(15);
+	/*a.insert(21);
+	a.insert(13);
+	a.insert(29);
+	a.insert(8);
+	a.insert(18);
+	a.insert(26);
+	a.insert(32);
 	a.insert(5);
+	a.insert(11);
+	a.insert(20);
+	a.insert(24);
+	a.insert(28);
+	a.insert(31);
+	a.insert(33);
+	a.insert(3);
+	a.insert(7);
+	a.insert(10);
+	a.insert(12);
+	a.insert(15);
+	a.insert(17);
+	a.insert(19);
+	a.insert(23);
+	a.insert(25);
+	a.insert(27);
+	a.insert(30);
+	a.insert(2);
+	a.insert(4);
+	a.insert(6);
+	a.insert(9);
+	a.insert(14);
+	a.insert(22);
+	a.insert(1);*/
+	//cout<<NULL;
 	a.inOrder(a.get_root());
+	cout<<"\n";
+	a.preOrder(a.get_root());
     return 0;
 }
