@@ -25,14 +25,18 @@ class bs_t{
 	
 	void inOrder(t_node *r)
 	{
-		if(r->left)
-		inOrder(r->left);
-		cout<<r->value<<" ";
-		if(r->right)
-		inOrder(r->right);
+		if(r!=NULL)
+		{
+			if(r->left)
+			inOrder(r->left);
+			if(r)
+			cout<<r->value<<" 1 ";
+			if(r->right)
+			inOrder(r->right);
+		}
 	}
 	
-		void preOrder(t_node *r)
+	void preOrder(t_node *r)
 	{
 		cout<<r->value;
 		if(r->left)
@@ -88,7 +92,7 @@ class bs_t{
 			add_n(r->right,v);
 			return 1;
 		}
-	}
+	}/*
 	int kth_smallest(int k)
 	{
 		if(!k)
@@ -98,7 +102,7 @@ class bs_t{
 		cout<<r->value;
 		if(r->right)
 		kth_smallest(k-1);
-	}
+	}*/
 };
 
 int main()
