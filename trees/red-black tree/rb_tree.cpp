@@ -75,6 +75,7 @@ class RbTree
 			p->right=pp;
 			p->c='b';
 			pp->c='r';
+			solveRedRed(p);
 			return;
 		}
 		
@@ -86,6 +87,7 @@ class RbTree
 			p->right=ptr->left;
 			ptr->left=p;
 			rightRotate(p);
+			solveRedRed(ptr);
 			return;
 		}
 		
@@ -97,6 +99,7 @@ class RbTree
 			p->left=pp;
 			p->c='b';
 			pp->c='r';
+			solveRedRed(p);
 			return; 
 		}
 		
@@ -108,11 +111,24 @@ class RbTree
 			p->left=ptr->right;
 			ptr->right=p;
 			leftRotate(p);
+			solveRedRed(ptr);
 			return;
 		}
 		
 		void solveRedRed(rb_node *ptr)
-		{								
+		{
+			if(ptr==NULL)	return;
+			if(ptr==root)
+			{
+				if(ptr->c=='b')	return;
+				ptr->c='b';
+				return;
+			}	
+			if(ptr->parent->parent==NULL)
+				{
+					ptr->parent->c='b';
+					return;
+				}						
 			if(ptr->parent==ptr->parent->parent->left)							//condition to find if ptr's parent is left child of it's gand parent
 			{
 				if(ptr->parent->parent->right==NULL)															//ptr's uncle doe not exist.
@@ -130,6 +146,7 @@ class RbTree
 					ptr->parent->c='b';
 					ptr->parent->parent->right->c='b';
 					ptr->parent->parent->c='r';
+					solveRedRed(ptr->parent);
 					//make a recursive call to check ptr->parent->parent
 				}
 				else if(ptr->parent->parent->right->c='b')														//ptr's uncle is black
@@ -143,6 +160,7 @@ class RbTree
 					else if(ptr==ptr->parent->right)															//rl case
 						leftRightRotate(ptr);					
 				}
+				//solveRedRed(ptr->parent);
 			}
 			else if(ptr->parent==ptr->parent->parent->right)					//condition to find if ptr's parent is right child of it's grand parent
 			{
@@ -162,6 +180,7 @@ class RbTree
 					ptr->parent->c='b';
 					ptr->parent->parent->left->c='b';
 					ptr->parent->parent->c='r';
+					solveRedRed(ptr->parent);
 					//make a recursive call to check ptr->parent->parent
 				}
 				else if(ptr->parent->parent->left->c='b')														//ptr's uncle is black
@@ -175,7 +194,9 @@ class RbTree
 					else if(ptr==ptr->parent->right)															//rr case
 						leftRotate(ptr);
 				}
+				//solveRedRed(ptr->parent);
 			}
+			
 		}
 		
 	void inOrder(rb_node *r)
@@ -199,6 +220,9 @@ int main()
 	tree->createNode(100);
 	tree->createNode(10);
 	tree->createNode(60);
+	tree->createNode(160);
+	//tree->createNode(70);
+	//tree->createNode(20);
 	tree->inOrder(tree->get_root());
 	return 0;
 }
