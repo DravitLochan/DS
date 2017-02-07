@@ -86,6 +86,7 @@ class RbTree
 			p->right=ptr->left;
 			ptr->left=p;
 			rightRotate(p);
+			return;
 		}
 		
 		void leftRotate(rb_node *ptr)
@@ -97,6 +98,17 @@ class RbTree
 			p->c='b';
 			pp->c='r';
 			return; 
+		}
+		
+		void rightLeftRotate(rb_node *ptr)
+		{
+			rb_node *p = ptr->parent;
+			rb_node *pp = ptr->parent;
+			pp->right=ptr;
+			p->left=ptr->right;
+			ptr->right=p;
+			leftRotate(p);
+			return;
 		}
 		
 		void solveRedRed(rb_node *ptr)
