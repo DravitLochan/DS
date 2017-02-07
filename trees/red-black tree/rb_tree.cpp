@@ -70,11 +70,12 @@ class RbTree
 		void rightRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
+			rb_node *pp = p->parent;
 			pp->left=p->right;
 			p->right=pp;
 			p->c='b';
 			pp->c='r';
+			solveRedRed(p);
 			return;
 		}
 		
@@ -82,37 +83,52 @@ class RbTree
 		{
 			rb_node *p = ptr->parent;
 			rb_node *pp = p->parent;
-			pp->right=ptr;
 			p->right=ptr->left;
 			ptr->left=p;
+			pp->left=ptr;
 			rightRotate(p);
+			solveRedRed(ptr);
 			return;
 		}
 		
 		void leftRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
+			rb_node *pp = p->parent;
 			pp->right=p->left;
 			p->left=pp;
 			p->c='b';
 			pp->c='r';
+			solveRedRed(p);
 			return; 
 		}
 		
 		void rightLeftRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
-			pp->right=ptr;
+			rb_node *pp = p->parent;
 			p->left=ptr->right;
+			pp->right=ptr;
 			ptr->right=p;
 			leftRotate(p);
+			solveRedRed(ptr);
 			return;
 		}
 		
 		void solveRedRed(rb_node *ptr)
-		{								
+		{
+			if(ptr==NULL)	return;
+			if(ptr==root)
+			{
+				if(ptr->c=='b')	return;
+				ptr->c='b';
+				return;
+			}	
+			if(ptr->parent->parent==NULL)
+				{
+					ptr->parent->c='b';
+					return;
+				}						
 			if(ptr->parent==ptr->parent->parent->left)							//condition to find if ptr's parent is left child of it's gand parent
 			{
 				if(ptr->parent->parent->right==NULL)															//ptr's uncle doe not exist.
@@ -130,6 +146,7 @@ class RbTree
 					ptr->parent->c='b';
 					ptr->parent->parent->right->c='b';
 					ptr->parent->parent->c='r';
+					solveRedRed(ptr->parent);
 					//make a recursive call to check ptr->parent->parent
 				}
 				else if(ptr->parent->parent->right->c='b')														//ptr's uncle is black
@@ -143,6 +160,7 @@ class RbTree
 					else if(ptr==ptr->parent->right)															//rl case
 						leftRightRotate(ptr);					
 				}
+				//solveRedRed(ptr->parent);
 			}
 			else if(ptr->parent==ptr->parent->parent->right)					//condition to find if ptr's parent is right child of it's grand parent
 			{
@@ -162,6 +180,7 @@ class RbTree
 					ptr->parent->c='b';
 					ptr->parent->parent->left->c='b';
 					ptr->parent->parent->c='r';
+					solveRedRed(ptr->parent);
 					//make a recursive call to check ptr->parent->parent
 				}
 				else if(ptr->parent->parent->left->c='b')														//ptr's uncle is black
@@ -175,20 +194,19 @@ class RbTree
 					else if(ptr==ptr->parent->right)															//rr case
 						leftRotate(ptr);
 				}
+				//solveRedRed(ptr->parent);
 			}
+			
 		}
 		
-	void inOrder(rb_node *r)
+	void infix(rb_node *root)
 	{
-		if(r!=NULL)
-		{
-			if(r->left)
-			inOrder(r->left);
-			if(r)
-			cout<<r->val<<" "<<r->c<<"\n";
-			if(r->right)
-			inOrder(r->right);
-		}
+    	if (root)
+    	{
+        	infix(root->left);
+        	cout<<root->val<<" "<<root->c<<"\n";
+        	infix(root->right);
+    	}
 	}
 };
 
@@ -199,6 +217,9 @@ int main()
 	tree->createNode(100);
 	tree->createNode(10);
 	tree->createNode(60);
-	tree->inOrder(tree->get_root());
+	//tree->createNode(70);
+	//tree->createNode(160);
+	//tree->createNode(20);
+	tree->infix(tree->get_root());
 	return 0;
 }
