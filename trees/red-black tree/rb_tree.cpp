@@ -40,7 +40,7 @@ class RbTree
 			rb_node *r = root;
 			if(r==NULL)
 			{
-				r = ptr;
+				root = ptr;							//doubt-> if we do r = ptr, why value of root does not change?
 				ptr->c='b';
 				return;
 			}
@@ -177,9 +177,28 @@ class RbTree
 				}
 			}
 		}
+		
+	void inOrder(rb_node *r)
+	{
+		if(r!=NULL)
+		{
+			if(r->left)
+			inOrder(r->left);
+			if(r)
+			cout<<r->val<<" "<<r->c<<"\n";
+			if(r->right)
+			inOrder(r->right);
+		}
+	}
 };
 
 int main()
 {
-	
+	RbTree *tree = new RbTree();
+	tree->createNode(50);
+	tree->createNode(100);
+	tree->createNode(10);
+	tree->createNode(60);
+	tree->inOrder(tree->get_root());
+	return 0;
 }
