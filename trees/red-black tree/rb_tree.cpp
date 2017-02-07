@@ -70,7 +70,7 @@ class RbTree
 		void rightRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
+			rb_node *pp = p->parent;
 			pp->left=p->right;
 			p->right=pp;
 			p->c='b';
@@ -83,9 +83,9 @@ class RbTree
 		{
 			rb_node *p = ptr->parent;
 			rb_node *pp = p->parent;
-			pp->right=ptr;
 			p->right=ptr->left;
 			ptr->left=p;
+			pp->left=ptr;
 			rightRotate(p);
 			solveRedRed(ptr);
 			return;
@@ -94,7 +94,7 @@ class RbTree
 		void leftRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
+			rb_node *pp = p->parent;
 			pp->right=p->left;
 			p->left=pp;
 			p->c='b';
@@ -106,9 +106,9 @@ class RbTree
 		void rightLeftRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
-			pp->right=ptr;
+			rb_node *pp = p->parent;
 			p->left=ptr->right;
+			pp->right=ptr;
 			ptr->right=p;
 			leftRotate(p);
 			solveRedRed(ptr);
@@ -199,17 +199,14 @@ class RbTree
 			
 		}
 		
-	void inOrder(rb_node *r)
+	void infix(rb_node *root)
 	{
-		if(r!=NULL)
-		{
-			if(r->left)
-			inOrder(r->left);
-			if(r)
-			cout<<r->val<<" "<<r->c<<"\n";
-			if(r->right)
-			inOrder(r->right);
-		}
+    	if (root)
+    	{
+        	infix(root->left);
+        	cout<<root->val<<" "<<root->c<<"\n";
+        	infix(root->right);
+    	}
 	}
 };
 
@@ -220,9 +217,9 @@ int main()
 	tree->createNode(100);
 	tree->createNode(10);
 	tree->createNode(60);
-	tree->createNode(160);
 	//tree->createNode(70);
+	//tree->createNode(160);
 	//tree->createNode(20);
-	tree->inOrder(tree->get_root());
+	tree->infix(tree->get_root());
 	return 0;
 }
