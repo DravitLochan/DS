@@ -88,6 +88,17 @@ class RbTree
 			rightRotate(p);
 		}
 		
+		void leftRotate(rb_node *ptr)
+		{
+			rb_node *p = ptr->parent;
+			rb_node *pp = ptr->parent;
+			pp->right=p->left;
+			p->left=pp;
+			p->c='b';
+			pp->c='r';
+			return; 
+		}
+		
 		void solveRedRed(rb_node *ptr)
 		{								
 			if(ptr->parent==ptr->parent->parent->left)							//condition to find if ptr's parent is left child of it's gand parent
