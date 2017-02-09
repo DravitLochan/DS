@@ -106,8 +106,11 @@ class RbTree
 		{
 			rb_node *p = ptr->parent;
 			rb_node *pp = p->parent;
-			pp->right=p->left;
-			pp->right->parent=pp;
+			if(p->left!=NULL)
+			{
+				pp->right=p->left;
+				pp->right->parent=pp;
+			}
 			p->left=pp;
 			pp->parent=p;
 			p->c='b';
@@ -120,8 +123,11 @@ class RbTree
 		{
 			rb_node *p = ptr->parent;
 			rb_node *pp = p->parent;
-			p->left=ptr->right;
-			p->left->parent=p;
+			if(ptr->right!=NULL)
+			{
+				p->left=ptr->right;
+				p->left->parent=p;
+			}
 			pp->right=ptr;
 			ptr->parent=pp;
 			ptr->right=p;
