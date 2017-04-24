@@ -70,11 +70,17 @@ class RbTree
 		void rightRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
-			pp->left=p->right;
+			rb_node *pp = p->parent;
+			if(p->right!=NULL)
+			{
+				pp->left=p->right;
+				pp->left->parent=pp;
+			}
 			p->right=pp;
+			pp->parent=p;
 			p->c='b';
 			pp->c='r';
+			solveRedRed(p);
 			return;
 		}
 		
@@ -82,54 +88,93 @@ class RbTree
 		{
 			rb_node *p = ptr->parent;
 			rb_node *pp = p->parent;
-			pp->right=ptr;
-			p->right=ptr->left;
+			if(ptr->left!=NULL)
+			{
+				p->right=ptr->left;
+				p->right->parent=p;
+			}
 			ptr->left=p;
+			p->parent=ptr;
+			pp->left=ptr;
+			ptr->parent=pp;
 			rightRotate(p);
+			solveRedRed(ptr);
 			return;
 		}
 		
 		void leftRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
-			pp->right=p->left;
+			rb_node *pp = p->parent;
+			if(p->left!=NULL)
+			{
+				pp->right=p->left;
+				pp->right->parent=pp;
+			}
 			p->left=pp;
+			pp->parent=p;
 			p->c='b';
 			pp->c='r';
+			solveRedRed(p);
 			return; 
 		}
 		
 		void rightLeftRotate(rb_node *ptr)
 		{
 			rb_node *p = ptr->parent;
-			rb_node *pp = ptr->parent;
+			rb_node *pp = p->parent;
+			if(ptr->right!=NULL)
+			{
+				p->left=ptr->right;
+				p->left->parent=p;
+			}
 			pp->right=ptr;
-			p->left=ptr->right;
+			ptr->parent=pp;
 			ptr->right=p;
+			p->parent=ptr;
 			leftRotate(p);
+			solveRedRed(ptr);
 			return;
 		}
 		
 		void solveRedRed(rb_node *ptr)
-		{								
+		{
+			//cout<<ptr->val<<"\n";
+			if(ptr==NULL)	return;
+			if(ptr==root)
+			{
+				if(ptr->c=='b')	return;
+				ptr->c='b';
+				return;
+			}	
+			if(ptr->parent->parent==NULL)
+				{
+					ptr->parent->c='b';
+					return;
+				}						
 			if(ptr->parent==ptr->parent->parent->left)							//condition to find if ptr's parent is left child of it's gand parent
 			{
+				//cout<<ptr->val<<"\n";
 				if(ptr->parent->parent->right==NULL)															//ptr's uncle doe not exist.
 				{
+					//cout<<ptr->val<<"\n";
 					/*check for 2 conditions. i.e. ll,rl (only 2 possible 
 					cases as we have found from above that parent is left 
 					child of ptr's grand parent)*/
 					if(ptr==ptr->parent->left)																	//ll case
 						rightRotate(ptr);
 					else if(ptr==ptr->parent->right)															//rl case
+					{
+						//cout<<ptr->val<<"\n";
 						leftRightRotate(ptr);					
+					}
 				}
 				else if(ptr->parent->parent->right->c=='r')														//ptr's uncle is red
 				{														
 					ptr->parent->c='b';
 					ptr->parent->parent->right->c='b';
 					ptr->parent->parent->c='r';
+					solveRedRed(ptr->parent);
 					//make a recursive call to check ptr->parent->parent
 				}
 				else if(ptr->parent->parent->right->c='b')														//ptr's uncle is black
@@ -143,6 +188,7 @@ class RbTree
 					else if(ptr==ptr->parent->right)															//rl case
 						leftRightRotate(ptr);					
 				}
+				//solveRedRed(ptr->parent);
 			}
 			else if(ptr->parent==ptr->parent->parent->right)					//condition to find if ptr's parent is right child of it's grand parent
 			{
@@ -162,6 +208,7 @@ class RbTree
 					ptr->parent->c='b';
 					ptr->parent->parent->left->c='b';
 					ptr->parent->parent->c='r';
+					solveRedRed(ptr->parent);
 					//make a recursive call to check ptr->parent->parent
 				}
 				else if(ptr->parent->parent->left->c='b')														//ptr's uncle is black
@@ -175,20 +222,19 @@ class RbTree
 					else if(ptr==ptr->parent->right)															//rr case
 						leftRotate(ptr);
 				}
+				//solveRedRed(ptr->parent);
 			}
+			
 		}
 		
-	void inOrder(rb_node *r)
+	void infix(rb_node *root)
 	{
-		if(r!=NULL)
-		{
-			if(r->left)
-			inOrder(r->left);
-			if(r)
-			cout<<r->val<<" "<<r->c<<"\n";
-			if(r->right)
-			inOrder(r->right);
-		}
+    	if (root)
+    	{
+        	infix(root->left);
+        	cout<<root->val<<" "<<root->c<<"\n";
+        	infix(root->right);
+    	}
 	}
 };
 
@@ -199,6 +245,9 @@ int main()
 	tree->createNode(100);
 	tree->createNode(10);
 	tree->createNode(60);
-	tree->inOrder(tree->get_root());
+	tree->createNode(70);
+	//tree->createNode(160);
+	//tree->createNode(20);
+	//tree->infix(tree->get_root());
 	return 0;
 }
