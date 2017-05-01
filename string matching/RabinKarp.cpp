@@ -6,10 +6,12 @@ using namespace std;
 
 int calculateHash(int old_hash, int m, int old_char, int new_char)
 {
+	//cout<<old_char<<" "<<new_char<<"\n";
 	int i, new_hash;
 	new_hash = old_hash - old_char;
 	new_hash /= prime;
-	new_hash += pow(prime, m-1);
+	new_hash += new_char*pow(prime, m-1);
+	//cout<<new_hash<<"\n";
 	return new_hash;
 }
 
@@ -18,9 +20,10 @@ int calculateHash(string str)
 	int hash = 0, i;
 	for(i = 0; i<str.length(); ++i)
 	{
-		hash += pow((int)str[i], i);
+		//cout<<(int)str[i]<<"\n";
+		hash += (int)str[i]*pow(prime, i);
 	}
-	cout<<hash<<"\n";
+	//cout<<hash<<"\n\n\n";
 	return hash;
 }
 
@@ -39,7 +42,7 @@ int rabinKarp(string text, string pattern)
 		}
 		else if(i != (text.length() - m))
 		{
-			sub_text_hash = calculateHash(sub_text_hash, m, text[i*m], text[(i*m)+m-1]);
+			sub_text_hash = calculateHash(sub_text_hash, m, text[i], text[i+m]);
 		}
 		else
 		return -1;
