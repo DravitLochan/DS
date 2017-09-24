@@ -32,7 +32,7 @@ int main(){
 	int goal[][3] = {1, 2, 3, 8, 0, 4, 7, 6, 5};
 	int current[][3] = {2, 8, 3, 1, 6, 4, 7, 0, 5};
 	// int current[][3] = {8, 1, 2, 7, 0, 3, 6, 5, 4};
-	int move[2][4] = {-1, 0, 1, 0, 0, 1, 0, -1};
+	int fill[2][4] = {-1, 0, 1, 0, 0, 1, 0, -1};
 	// manhatanDistance(goal, current);
 	int manDistance = manhatanDistance(goal, current);
 	cout<< manDistance;
