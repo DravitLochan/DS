@@ -105,6 +105,10 @@ class bs_t{
 	}*/
 };
 
+void test_func(){
+	cout<<"this is a test function!!";
+}
+
 int main()
 {
 	t_node *head=new t_node;
