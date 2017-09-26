@@ -174,6 +174,11 @@ public:
 			}
 		}
 	}
+
+    void test_func(){
+	cout<<"this is a test function!!";
+    }
+
     void insert(int n_v)
     {
     	t_node *n;

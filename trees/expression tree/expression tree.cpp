@@ -90,6 +90,9 @@ class exp_t{
 		}
 		return stack[0];
 	}
+     void test_func(){
+	cout<<"this is a test function!!";
+     }
 };
 
 

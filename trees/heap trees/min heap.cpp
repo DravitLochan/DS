@@ -68,6 +68,10 @@ class min_h{
             cout<<*(m_heap+i)<<" ";
     }
 
+    void test_func(){
+	cout<<"this is a test function!!";
+    }
+
 };
 
 
