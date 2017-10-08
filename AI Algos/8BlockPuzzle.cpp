@@ -1,99 +1,275 @@
-#include<iostream>
-#include<stdlib.h>
-#include<limits.h>
-#include<algorithm>
+/*
+Bibliography:
+https://www.cs.princeton.edu/courses/archive/spr10/cos226/assignments/8puzzle.html
+https://www.cs.bham.ac.uk/~mdr/teaching/modules04/java2/TilesSolvability.html
 
-using namespace std;
+Special thanks to:
+https://n-puzzle-solver.appspot.com/
+http://mypuzzle.org/sliding
+-------------------------------------------------------------------------------
 
-int * findXPos(int goal[3][3], int x) {												// takes 2 parameters, returns a ptr where *pos = x coordinate
-	int *pos = new int();															// and *(pos + 1) = y coordinate of element x in the goal state
-	for(int i = 0; i < 3; ++i)
-		for(int j = 0; j < 3; ++j){
-			if(goal[i][j] == x){
+Author: George Mocanu, 2017
+E-mail: razboi4@yahoo.com
+
+Tested under gcc version 5.4.0
+*/
+
+#include <iostream>
+#include <queue>
+
+// change grid size here
+#define BOARDSIZE 3
+
+#define st first
+#define nd second
+
+const int vert[4] = {-1, 0, 1, 0};
+const int oriz[4] = {0, 1, 0, -1};
+
+class Board {
+private:
+	std::vector<int> steps; 
+	int tiles[BOARDSIZE][BOARDSIZE];
+	int row0, col0;
+
+public:
+	Board(): row0(0), col0(0){};
+	Board operator=(const Board&);
+	Board* moveTile(int);
+	void getBoard();
+	void printBoard();
+	void printSolution(int);
+	int hamming(int [][BOARDSIZE]);
+	int manhattan(int [][BOARDSIZE]);
+	int stepsNumber() const;
+	int lastStep() const;
+	int blankRow() const;
+	int blankCol() const;
+	bool equals(int [][BOARDSIZE]);
+
+	friend int inversionCounter(const Board&);
+};
+
+struct cmp
+{
+    bool operator()(std::pair<int, Board> const& i, std::pair<int, Board> const& j) const
+    {
+        return i.st > j.st;
+    }
+};
+
+int* findXPos(int goal[][BOARDSIZE], int x)
+{
+	int* pos = new int();
+
+	for(int i = 0; i < BOARDSIZE; ++ i)
+		for(int j = 0; j < BOARDSIZE; ++ j)
+			if (goal[i][j] == x){
 				*pos = i;
 				*(pos + 1) = j;
 				return pos;
 			}
-		}	
 }
 
-int canTraverse(int moveX, int moveY, int moveFromX, int moveFromY){
-	if((moveFromX + moveX >= 0) && (moveFromY + moveY >= 0) && (moveFromX + moveX < 3) && (moveFromY + moveY < 3))
-		return 1;
-	return 0;
+void goalBoard(int goal[][BOARDSIZE])
+{
+	for (int i = 0; i < BOARDSIZE; ++ i)
+		for (int j = 0; j < BOARDSIZE; ++ j)
+			goal[i][j] = (i * BOARDSIZE + j + 1) % (BOARDSIZE * BOARDSIZE);
 }
 
-int manhatanDistance(int goal[3][3], int current[3][3]){							// function to find manhatan distance
-	int manDistance = 0;
-	for(int i = 0; i < 3; ++i){
-		for(int j = 0; j < 3; ++j){
-			if(current[i][j] == 0)
-				continue;
-			int *pos = findXPos(goal, current[i][j]);
-			// cout<<*pos << "," << *(pos + 1) << ",";
-			manDistance += (i - *pos < 0 ? *pos - i : i - *pos) + (j - *(pos + 1) < 0 ? *(pos + 1) - j : j - *(pos + 1));
-			// cout<<manDistance<<"; ";
-		}
-		// cout<< "\n";
-	}
-	return manDistance;
+Board Board::operator=(const Board& op)
+{
+	this->steps = op.steps;
+	this->row0 = op.row0;
+	this->col0 = op.col0;
+
+	for (int i = 0; i < BOARDSIZE; ++ i)
+		for (int j= 0 ; j < BOARDSIZE; ++ j)
+			this->tiles[i][j] = op.tiles[i][j];
+
+	return *this;
 }
 
-void move(int current[3][3], int moveX, int moveY, int moveFromX, int moveFromY){
-	int x = moveFromX + moveX;
-	int y = moveFromY + moveY;
-	swap(current[x][y], current[moveFromX][moveFromY]);
+Board* Board::moveTile(int direction)
+{
+	Board* tmp = new Board();
+	*tmp = *this;
+
+	int a = tmp->row0 + vert[direction];
+	int b = tmp->col0 + oriz[direction];
+
+	tmp->tiles[tmp->row0][tmp->col0] = tmp->tiles[a][b];
+	tmp->tiles[a][b] = 0;
+	tmp->row0 = a;
+	tmp->col0 = b;
+	tmp->steps.push_back(direction);
+
+	return tmp;
 }
 
-int main(){
-	int goal[][3] = {1, 2, 3, 8, 0, 4, 7, 6, 5};
-	int current[][3] = {2, 8, 3, 1, 6, 4, 7, 0, 5};
-	// int current[][3] = {8, 1, 2, 7, 0, 3, 6, 5, 4};
-	int fill[2][4] = {-1, 0, 1, 0, 0, 1, 0, -1};									// fill[0] = movement along the rows, fill[1] = movement along columns
-	// manhatanDistance(goal, current);												// these movement are applied on 0.
-	int manDistance = manhatanDistance(goal, current);
-	// cout<< manDistance<<"\n";
-	while(manDistance){
-		int *pos = findXPos(current, 0);
-		int manDistanceArray[4], tempArr[4];
-		int i, tempCurrent[3][3];
-		for(i = 0; i < 4; ++i){
-			for(int j = 0; j<3; ++j)
-				for(int k = 0; k<3; ++k)
-					tempCurrent[j][k] = current[j][k];
-			if(canTraverse(fill[0][i], fill[1][i], *pos, *(pos + 1))){
-				move(tempCurrent, fill[0][i], fill[1][i], *pos, *(pos + 1));
-				manDistanceArray[i]  = manhatanDistance(tempCurrent, goal);
-			} else {
-				manDistanceArray[i] = INT_MAX;
+void Board::getBoard()
+{
+	for (int i = 0; i < BOARDSIZE; ++ i)
+		for (int j = 0; j < BOARDSIZE; ++ j) {
+			std::cin >> this->tiles[i][j];
+
+			if (this->tiles[i][j] == 0) {
+				this->col0 = j;
+				this->row0 = i;
 			}
 		}
-		cout<<"manDistanceArray : \n";
-		for (int j = 0; j < 4; ++j)
-		{
-			tempArr[j] = manDistanceArray[j];
-			cout<<manDistanceArray[j]<<" ";
-		}
-		sort(manDistanceArray, manDistanceArray + 4);
-		cout<<"\n";
-		for(int j = 0; j < 4; ++j){
-				if(tempArr[j] == manDistanceArray[0])
-					i =j;
-		}
-		if(manDistanceArray[0] > manDistance){
-			cout << "no possible solution\n";
-			exit(1);
-		} else {
-			cout<<"manDistanceArray[0] = "<<manDistanceArray[0]<<"\n";
-			cout<<"i is "<<i<<"\n";
-			manDistance =  manDistanceArray[0];
-			move(current, fill[0][i], fill[1][i], *pos, *(pos + 1));
-			cout<<"current : \n";
-			for(int a = 0; a < 3; ++a)
-				for(int b = 0; b < 3; ++b)
-					cout<<current[a][b]<<" ";
-			cout<<"\n";	
-		}
+}
+
+void Board::printBoard()
+{
+	for (int i = 0; i < BOARDSIZE; ++ i) {
+		for (int j = 0; j < BOARDSIZE; ++ j)
+			std::cout << tiles[i][j] << " ";
+		std::cout << "\n";
 	}
+
+	std::cout << "\n";
+}
+
+void Board::printSolution(int step)
+{
+	if (step > 0) {
+		Board *tmp = this->moveTile((this->steps[step - 1] + 2) % 4);
+		tmp->printSolution(step - 1);
+	}
+
+	this->printBoard();
+
+}
+
+int Board::manhattan(int goal[][BOARDSIZE])
+{
+	int manDist = 0;
+
+	for (int i = 0; i < BOARDSIZE; ++ i)
+		for (int j = 0; j < BOARDSIZE; ++ j) {
+			int* pos = findXPos(goal, this->tiles[i][j]);
+			manDist += (i - *pos < 0 ? *pos - i : i - *pos) + (j - *(pos + 1) < 0 ? *(pos + 1) - j : j - *(pos + 1));
+		}
+
+	return manDist + this->steps.size() - 1;
+}
+
+int Board::stepsNumber() const
+{
+	return this->steps.size();
+}
+
+int Board::lastStep() const
+{
+	if (this->stepsNumber() > 0)
+		return this->steps.back();
+
+	return -4;
+}
+
+int Board::blankRow() const
+{
+	return this->row0;
+}
+
+int Board::blankCol() const
+{
+	return this->col0;
+}
+
+bool Board::equals(int goal[BOARDSIZE][BOARDSIZE])
+{
+	for (int i = 0; i < BOARDSIZE; ++ i)
+		for (int j = 0; j < BOARDSIZE; ++ j)
+			if (this->tiles[i][j] != goal[i][j])
+				return false;
+
+	return true;
+}
+
+int inversionCounter(const Board& op)
+{
+	int invCount = 0;
+
+	for (int i = 0; i < BOARDSIZE * BOARDSIZE; ++ i) {
+		if (*(*op.tiles + i) == 0)
+			continue;
+
+		for (int j = i + 1; j < BOARDSIZE * BOARDSIZE; ++ j)
+			if (*(*op.tiles + j) && *(*op.tiles + i) > *(*op.tiles + j))
+				++ invCount;
+	}
+
+	return invCount;
+}
+
+bool isSolvable(const Board& op)
+{
+	int invNum = inversionCounter(op);
+
+
+	if (BOARDSIZE & 1 && !(invNum & 1))
+		return true;
+	if (!(BOARDSIZE & 1) && ((!(op.blankRow() & 1) && invNum & 1) || (op.blankRow() & 1 && !(invNum & 1))))
+			return true;
+
+	return false;
+}
+
+void solve(const Board& start, int goal[][BOARDSIZE])
+{
+	if (!isSolvable(start)) {
+		std::cout << "\nThe board is not solvable!\n";
+		return;
+	}
+
+	std::priority_queue<std::pair<int, Board>, std::vector<std::pair<int, Board> >, cmp> Q;
+	Q.push(std::make_pair(0, start));
+
+	while (!Q.empty()) {
+		Board curr = Q.top().nd;
+		Q.pop();
+
+		if (curr.equals(goal)) {
+			char ch;
+
+			std::cout << "\nIt takes " << curr.stepsNumber() << " moves to reach the goal state.\n";
+			std::cout << "\nPress y if you want to display the moves.\n";
+			std::cin >> ch;
+
+			if (ch == 'y')
+				curr.printSolution(curr.stepsNumber());
+
+			return;
+		}
+
+		for (int k = 0; k < 4; ++ k) {
+			if ((curr.lastStep() + 2) % 4 == k)
+				continue;
+
+			int a = curr.blankRow() + vert[k];
+			int b = curr.blankCol() + oriz[k];
+
+			if (a < BOARDSIZE && a >= 0 && b < BOARDSIZE && b >= 0) {
+				Board *tmp = curr.moveTile(k);
+
+				Q.push(std::make_pair((*tmp).manhattan(goal), *tmp));
+			}
+		} 
+	}
+}
+
+int main()
+{
+	Board start;
+	int goal[BOARDSIZE][BOARDSIZE];
+
+	std::cout << "Insert initial board:\n";
+	start.getBoard();
+	goalBoard(goal);
+	solve(start, goal);
+
 	return 0;
 }
