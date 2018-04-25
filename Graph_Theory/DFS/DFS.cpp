@@ -1,120 +1,70 @@
 #include<iostream>
+#include<vector>
+#include <algorithm>
+
 using namespace std;
 
 /*
-	test values have been alongside in the comments.
+	@DravitLochan
 */
 
-
-class node{
-	int val,*adj,size;
-	char col;
+class Graph{
+	
 	public:
-		int get_val()
-		{
-			return val;
+	int v, e;
+	vector< vector<int> > adjecency_list;
+	
+	Graph(int v, int e) {
+		this->v = v;
+		this->e = e;
+		adjecency_list.resize(v);
+		for(int i = 0; i < v; ++i){
+			adjecency_list[i].push_back(i);
 		}
-		void put_val(int x)
-		{
-			val=x;
-		}
-		char get_col()
-		{
-			return col;
-		}
-		int put_col(char x)				//returns value 0 or  1 depending on the fact that x=='w'
-		{
-			if(x=='w'||x=='g'||x=='b')
-			{
-				col=x;
-				return 1;
-			}
-			return 0;
-		}
-		void put_adj(int n)					
-		{
-			int x;
-			size=n;
-			adj=new int(n);
-			if(n!=0)
-			cout<<"Enter the nodes one-by-one\n";
-			/*
-			{2,5,
-			1,18,19,
-			1,23,57,
-			2,92,
-			2,92,
-			5,92,
-			5,92,
-			18,19,23,57}
-			*/
-			for(int i=0; i<n; ++i)
-			{
-				cin>>x;
-				*(adj+i)=x;
+	}
+	
+		// undirected graph, so insert twice
+		
+	void addEdge(int v1, int v2) {
+		this->adjecency_list[v1].push_back(v2);
+		this->adjecency_list[v2].push_back(v1);
+	}
+	
+	void dfsTraversal(int vertice, vector<int> visited) {
+		// cout<<visited[vertice];
+		if(!visited[vertice]) {
+			// cout<<vertice<<"\n";
+			visited[vertice] = 1;
+			for(int a = 0; a < adjecency_list[vertice].size(); ++a) {
+				if(!visited[a]) {
+					cout<<a<<"\n";
+					dfsTraversal(a, visited);
+				}
 			}
 		}
-		int* get_adj()
-		{
-			return adj;
-		}
-		int find_n()
-		{
-			return size;
-		}
+	}
+	
 };
 
-node visit_forward(node g[],node u,int n)
-{
-	int *temp=new int(n),i;
-	temp=u.get_adj();
-	for(i=0;i<n;++i)
-	{
-		if(g[*(temp+i)-1].get_col()=='w')
-		{
-			cout<<g[*(temp+i)-1].get_val();
-			g[*(temp+i)-1].put_col('g');
-			visit_forward(g,g[*(temp+i)-1],g[*(temp+i)-1].find_n());
-			//cout<<"\nb";
-		}
-		
+int main() {
+	
+	int v, e, i, v1, v2;
+	cout<<"enter number of vertices \n";
+	cin>>v;
+	vector<int> visited(v, 0);
+    cout<<"enter number of edges \n";
+    cin>>e;
+    Graph g = Graph(v, e);
+    i = 0;
+    cout<<"Enter vertices in pair for an edge \n";
+    while(i<e) {
+    	cin>>v1>>v2;
+    	g.addEdge(v1, v2);
+    	++i;
 	}
-	g[i].put_col('b');
-	return u;
-}
-
-int main()
-{
-	int ctr_n,ctr_e,i,j,t,n;									//e=edges,n=nodes
-	cout<<"Enter the number of nodes\n";
-	cin>>ctr_n;													//for test give n=8
-	cout<<"Enter the number of edges\n";						
-	cin>>ctr_e;
-	node g[ctr_n];
-	for(i=0;i<ctr_n;++i)
-	{
-		int flag=0;
-		while(!flag)				//this loop is just to check that no node is assigned a color apart from white, black or grey.
-		{
-			flag=g[i].put_col('w');
-		}
-		cout<<"Enter the value for node "<<i+1<<" :\n";
-		cin>>t;															//	{1,2,5,18,1,23,57,92}
-		g[i].put_val(t);
-		cout<<"Enter the number of nodes to which the current node is connected\n";
-		cin>>n;														   //   {2,3,3,2,2,2,2,4}
-		g[i].put_adj(n);
-	}
-	for(i=0;i<ctr_n;++i)
-	{
-		if(g[i].get_col()=='w')
-		{
-			g[i].put_col('g');
-			cout<<g[i].get_val();
-		}
-		g[i]=visit_forward(g,g[i],g[i].find_n());
-		//g[i].put_col('b');
-	}
+	// cout<<visited[0];
+	g.dfsTraversal(0, visited);
 	return 0;
+
 }
 
